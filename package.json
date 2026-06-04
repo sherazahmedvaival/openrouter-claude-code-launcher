@@ -1,0 +1,25 @@
+{
+  "name": "orcc",
+  "version": "0.1.0",
+  "description": "OpenRouter launcher for Claude Code — browse OpenRouter models (free + paid) and launch Claude Code against the selected one.",
+  "type": "module",
+  "bin": {
+    "orcc": "bin/orcc.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node bin/orcc.js"
+  },
+  "keywords": [
+    "openrouter",
+    "claude-code",
+    "cli",
+    "launcher"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/prompts": "^7.2.0"
+  }
+}

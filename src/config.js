@@ -78,6 +78,25 @@ export async function setLastModel(id) {
   await writeJson(configPath(), cfg);
 }
 
+// ---- favourites ----
+
+export async function getFavourites() {
+  const cfg = await readConfig();
+  return Array.isArray(cfg.favourites) ? cfg.favourites : [];
+}
+
+/** Add or remove a model id from favourites. Returns true if it is now a favourite. */
+export async function toggleFavourite(id) {
+  const cfg = await readConfig();
+  const favs = Array.isArray(cfg.favourites) ? cfg.favourites : [];
+  const at = favs.indexOf(id);
+  if (at >= 0) favs.splice(at, 1);
+  else favs.push(id);
+  cfg.favourites = favs;
+  await writeJson(configPath(), cfg);
+  return favs.includes(id);
+}
+
 // ---- model-list cache ----
 
 /** Return cached models. `allowStale` returns expired cache too (network-failure fallback). */
@@ -91,4 +110,19 @@ export async function readCache({ allowStale = false } = {}) {
 
 export async function writeCache(models) {
   await writeJson(cachePath(), { fetchedAt: Date.now(), models });
+}
+
+// ---- uninstall ----
+
+/** Remove orcc's data directory (config + cache). Returns { dir, existed }. */
+export async function removeConfigDir() {
+  const dir = configDir();
+  let existed = true;
+  try {
+    await fs.access(dir);
+  } catch {
+    existed = false;
+  }
+  if (existed) await fs.rm(dir, { recursive: true, force: true });
+  return { dir, existed };
 }

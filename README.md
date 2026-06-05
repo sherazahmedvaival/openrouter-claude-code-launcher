@@ -28,8 +28,9 @@ pick a fresh model each time, and nothing leaks into your shell or your repo.
 ## Features
 
 - 🔎 **Full catalog** — fetches every model from OpenRouter's public API (no key needed just to browse).
-- 🆓💲 **Free / Paid first** — choose a category up front, then browse just that list.
-- ⌨️ **Searchable picker** — type to fuzzy-filter hundreds of models; arrow keys to navigate.
+- 🆓💲 **Free / Paid / Favourites / Search-all** — choose a category up front, or search across everything.
+- ⌨️ **Searchable picker** — type to fuzzy-filter by id or name; arrow keys to navigate.
+- ⭐ **Favourites** — star any model while selecting; favourites persist (in your config) and are pinned to the top of every list.
 - 💸 **Cheapest-first** — paid models are sorted by price ascending; `⭐` marks Anthropic (recommended for Claude Code).
 - 🛠️ **Tool-capable only** — hides models that lack `tools` support (Claude Code is tool-use driven and won't work without it).
 - 🧹 **Clean pricing** — filters out sentinel/invalid-price entries (e.g. `openrouter/auto`).
@@ -109,11 +110,15 @@ orcc -- --dangerously-skip-permissions        # forward args after -- to claude
 
 Running `orcc` with no flags:
 
-1. Asks **Free or Paid** — then shows only that category.
-2. Opens a **searchable list** (type to filter, ↑/↓ to browse, `↩ Back` to switch
-   category). **Paid is sorted cheapest-first**; `⭐` marks Anthropic (recommended).
-3. A free selection prints a one-line reliability warning (non-blocking) and proceeds.
-4. Prompts for your API key if one isn't already configured, then launches Claude Code.
+1. Pick a category: **★ Favourites**, **🔍 Search all models** (across free + paid),
+   **Paid**, or **Free**.
+2. Browse a **searchable list** — type to filter by id/name, ↑/↓ to navigate,
+   `↩ Back` to change category. **Paid is cheapest-first**; `⭐` marks Anthropic;
+   **★ favourites are pinned to the top**.
+3. After choosing a model: **Launch** it, or **★ add / remove it from favourites**
+   (saved in your config and pinned next time).
+4. A free selection prints a one-line reliability warning (non-blocking).
+5. Prompts for your API key if one isn't already configured, then launches Claude Code.
 
 ## Credentials
 
@@ -125,6 +130,21 @@ Running `orcc` with no flags:
 
 The config lives at `~/.config/orcc/config.json` (POSIX, written `chmod 600`) or
 `%APPDATA%\orcc\config.json` (Windows). It also stores the short-lived model-list cache.
+
+## Uninstall
+
+```bash
+orcc --uninstall          # interactive: remove orcc's saved data, then optionally the package
+orcc --uninstall --yes    # non-interactive: remove data + the global package, no prompts
+```
+
+`--uninstall` deletes orcc's data directory (`~/.config/orcc` or `%APPDATA%\orcc` —
+API key, favourites, last model, cache) and can also run the global `npm uninstall`
+for you. To remove just the command yourself:
+
+```bash
+npm uninstall -g openrouter-claude-code-launcher
+```
 
 ## Choosing a model
 

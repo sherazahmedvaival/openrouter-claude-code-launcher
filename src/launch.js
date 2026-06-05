@@ -5,6 +5,15 @@ import { ANTHROPIC_BASE_URL } from './openrouter.js';
 
 const onWindows = process.platform === 'win32';
 
+/** Run `npm uninstall -g <pkg>`, inheriting stdio. Resolves with the exit code. */
+export function npmUninstallGlobal(pkg) {
+  return new Promise((resolve) => {
+    const child = spawn('npm', ['uninstall', '-g', pkg], { stdio: 'inherit', shell: onWindows });
+    child.on('error', () => resolve(1));
+    child.on('exit', (code) => resolve(code ?? 1));
+  });
+}
+
 /** Quick preflight: is the `claude` CLI on PATH? */
 export function isClaudeInstalled() {
   try {

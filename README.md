@@ -64,23 +64,31 @@ main model it uses the cheapest Anthropic *haiku*, otherwise it reuses your pick
 
 ## Installation
 
+**Run instantly with `npx`** (nothing installed permanently):
+
 ```bash
-git clone git@github.com:sherazahmedvaival/openrouter-claude-code-launcher.git
-cd openrouter-claude-code-launcher
-npm install
+npx openrouter-claude-code-launcher
 ```
 
-Then either link it onto your `PATH`:
+**Or install globally** for a persistent `orcc` command:
 
 ```bash
-npm link        # now `orcc` is available anywhere
+npm install -g openrouter-claude-code-launcher
 orcc
 ```
 
-…or run it directly without linking:
+The package ships as a **single bundled file**, so there's no dependency tree to
+download — installs and `npx` cold-starts are fast. Requires Node ≥ 18 (and Claude
+Code — see [Prerequisites](#prerequisites)).
+
+### From source (development)
 
 ```bash
-node bin/orcc.js
+git clone git@github.com:sherazahmedvaival/openrouter-claude-code-launcher.git
+cd openrouter-claude-code-launcher
+npm install            # installs deps and builds dist/ via the `prepare` hook
+node bin/orcc.js       # run directly from the ESM source
+# or: npm link         # symlink the global `orcc` to your checkout
 ```
 
 ## Usage
@@ -143,6 +151,17 @@ The config lives at `~/.config/orcc/config.json` (POSIX, written `chmod 600`) or
 A model is **free** only when both its `prompt` and `completion` prices are `0` on
 OpenRouter (these IDs usually end in `:free`). Everything else is **paid** and billed to
 your OpenRouter account. Only **tool-capable** models are listed in either group.
+
+## Publishing (maintainers)
+
+```bash
+npm version <patch|minor|major>   # bump version + tag
+npm publish                       # `prepare` rebuilds dist/orcc.cjs before packing
+git push --follow-tags
+```
+
+The published tarball contains only `dist/orcc.cjs`, `package.json`, `README.md`,
+and `LICENSE` (enforced by the `files` whitelist) — source and dev deps stay out.
 
 ## License
 

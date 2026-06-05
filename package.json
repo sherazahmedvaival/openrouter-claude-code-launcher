@@ -1,25 +1,49 @@
 {
-  "name": "orcc",
+  "name": "openrouter-claude-code-launcher",
   "version": "0.1.0",
   "description": "OpenRouter launcher for Claude Code — browse OpenRouter models (free + paid) and launch Claude Code against the selected one.",
   "type": "module",
   "bin": {
-    "orcc": "bin/orcc.js"
+    "orcc": "dist/orcc.cjs"
   },
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "start": "node bin/orcc.js"
+    "start": "node bin/orcc.js",
+    "build": "node build.js",
+    "prepare": "npm run build"
   },
   "keywords": [
     "openrouter",
     "claude-code",
+    "claude",
+    "anthropic",
     "cli",
-    "launcher"
+    "launcher",
+    "llm",
+    "ai-coding-assistant"
   ],
+  "author": "Sheraz Ahmed",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sherazahmedvaival/openrouter-claude-code-launcher.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sherazahmedvaival/openrouter-claude-code-launcher/issues"
+  },
+  "homepage": "https://github.com/sherazahmedvaival/openrouter-claude-code-launcher#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@inquirer/prompts": "^7.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0"
   }
 }

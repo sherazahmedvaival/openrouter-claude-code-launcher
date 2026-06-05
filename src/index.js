@@ -7,6 +7,7 @@ import {
   setLastModel,
   getFavourites,
   toggleFavourite,
+  setUpdateCheck,
   configDir,
   removeConfigDir,
 } from './config.js';
@@ -19,10 +20,9 @@ import {
   modelAction,
   PICK_BACK,
 } from './ui.js';
-import { isClaudeInstalled, launchClaude, npmUninstallGlobal } from './launch.js';
-
-/** npm package name (the installed command stays `orcc`). */
-const PACKAGE_NAME = 'openrouter-claude-code-launcher';
+import { isClaudeInstalled, launchClaude, npmUninstallGlobal, npmInstallGlobalLatest } from './launch.js';
+import { VERSION } from './version.js';
+import { PACKAGE_NAME, isNewer, fetchLatestVersion, getLatestVersionThrottled } from './update.js';
 
 const HELP = `
 orcc — OpenRouter launcher for Claude Code
@@ -36,6 +36,8 @@ Options:
   -r, --refresh      Ignore the cached model list and re-fetch
   -u, --uninstall    Remove orcc's saved data (and optionally the global package)
   -y, --yes          Skip confirmation prompts (use with --uninstall)
+      --update       Update orcc to the latest version from npm
+  -v, --version      Print the orcc version
   -h, --help         Show this help
 
 Credentials:
@@ -56,7 +58,10 @@ const freeWarning = (id) =>
 
 /** Minimal flag parser. Returns parsed options + claude passthrough args. */
 function parseArgs(argv) {
-  const opts = { help: false, list: false, refresh: false, uninstall: false, yes: false, model: null, passthrough: [] };
+  const opts = {
+    help: false, list: false, refresh: false, uninstall: false, yes: false,
+    update: false, version: false, model: null, passthrough: [],
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--') { opts.passthrough = argv.slice(i + 1); break; }
@@ -65,6 +70,8 @@ function parseArgs(argv) {
     else if (a === '-r' || a === '--refresh') opts.refresh = true;
     else if (a === '-u' || a === '--uninstall') opts.uninstall = true;
     else if (a === '-y' || a === '--yes') opts.yes = true;
+    else if (a === '--update') opts.update = true;
+    else if (a === '-v' || a === '--version') opts.version = true;
     else if (a === '-m' || a === '--model') opts.model = argv[++i];
     else if (a.startsWith('--model=')) opts.model = a.slice('--model='.length);
     else console.error(`Ignoring unknown option: ${a}`);
@@ -176,6 +183,57 @@ async function runUninstall({ yes }) {
   return 0;
 }
 
+/**
+ * Manual update: check npm for the latest version and run `npm install -g <pkg>@latest`.
+ * Returns a process exit code.
+ */
+async function runUpdate() {
+  console.log(`\norcc — update\n\nInstalled version: ${VERSION}`);
+  if (VERSION === 'dev') {
+    console.log('Running from source (dev). Update your git checkout, or install the published build:');
+    console.log(`  npm install -g ${PACKAGE_NAME}@latest`);
+    return 0;
+  }
+
+  console.log('Checking npm for the latest version…');
+  const latest = await fetchLatestVersion({ timeoutMs: 6000 });
+  if (!latest) {
+    console.log(`Could not reach the npm registry. Try again later, or run:\n  npm install -g ${PACKAGE_NAME}@latest`);
+    return 1;
+  }
+  await setUpdateCheck({ at: Date.now(), latest }); // refresh the throttle cache
+
+  if (!isNewer(latest, VERSION)) {
+    console.log(`✓ You're already on the latest version (${VERSION}).`);
+    return 0;
+  }
+
+  console.log(`Updating ${VERSION} → ${latest}\n\n$ npm install -g ${PACKAGE_NAME}@latest`);
+  const code = await npmInstallGlobalLatest(PACKAGE_NAME);
+  if (code === 0) {
+    console.log(`\n✓ Updated to ${latest}. Run orcc again to use it.`);
+    return 0;
+  }
+  console.log(
+    `\n(could not auto-update — exit ${code}). If you use npx, just re-run \`npx ${PACKAGE_NAME}\`; ` +
+      `if installed globally, run:\n  npm install -g ${PACKAGE_NAME}@latest`,
+  );
+  return 1;
+}
+
+/** Non-blocking, throttled "update available" notice for interactive launches. */
+async function maybeNotifyUpdate() {
+  if (VERSION === 'dev' || process.env.ORCC_NO_UPDATE_CHECK) return;
+  try {
+    const latest = await getLatestVersionThrottled();
+    if (isNewer(latest, VERSION)) {
+      console.log(`\n⬆  Update available: ${VERSION} → ${latest}.  Run \`orcc --update\` to upgrade.`);
+    }
+  } catch {
+    /* never block the launcher on update checks */
+  }
+}
+
 /** Resolve an API key from env/config, prompting (and optionally saving) if needed. */
 async function resolveApiKey() {
   const { key } = await getApiKey();
@@ -191,8 +249,10 @@ async function resolveApiKey() {
 
 export async function main() {
   const opts = parseArgs(process.argv.slice(2));
+  if (opts.version) { console.log(VERSION); return; }
   if (opts.help) { console.log(HELP); return; }
   if (opts.uninstall) { process.exit(await runUninstall({ yes: opts.yes })); }
+  if (opts.update) { process.exit(await runUpdate()); }
 
   // 1. Fetch + categorize models (with cache and stale-cache fallback).
   let result;
@@ -214,6 +274,9 @@ export async function main() {
   }
 
   if (opts.list) { printList(free, paid); return; }
+
+  // Non-blocking, throttled notice if a newer orcc is published.
+  await maybeNotifyUpdate();
 
   const all = [...free, ...paid];
 

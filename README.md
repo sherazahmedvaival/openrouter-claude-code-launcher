@@ -40,7 +40,8 @@ pick a fresh model each time, and nothing leaks into your shell or your repo.
 - ⚡ **Cached + resilient** — short-lived model-list cache with stale-fallback on network failure.
 - 🧯 **Robust errors** — clear handling for missing key, network failure, missing `claude` binary, and empty model lists; passes Claude Code's exit code through.
 - 🪟🍎🐧 **Cross-platform** — macOS, Linux, and Windows.
-- 🧰 **Scriptable** — non-interactive flags (`--model`, `--list`, `--refresh`).
+- ⬆ **Self-update** — notifies when a newer version is on npm (throttled, non-blocking); `orcc --update` upgrades in place.
+- 🧰 **Scriptable** — non-interactive flags (`--model`, `--list`, `--refresh`, `--version`, `--update`).
 
 ## How it works
 
@@ -130,6 +131,19 @@ Running `orcc` with no flags:
 
 The config lives at `~/.config/orcc/config.json` (POSIX, written `chmod 600`) or
 `%APPDATA%\orcc\config.json` (Windows). It also stores the short-lived model-list cache.
+
+## Updating
+
+orcc checks npm for a newer version (at most once a day, non-blocking) and prints a
+notice when one is available. To update:
+
+```bash
+orcc --update      # install the latest from npm (npm install -g …@latest)
+orcc --version     # show the installed version
+```
+
+Using `npx`? You always run the latest: `npx openrouter-claude-code-launcher`.
+Set `ORCC_NO_UPDATE_CHECK=1` to disable the background check.
 
 ## Uninstall
 

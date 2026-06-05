@@ -6,7 +6,9 @@
 // Source stays ESM (src/, bin/) for local development (`node bin/orcc.js`).
 
 import { build } from 'esbuild';
-import { chmodSync } from 'node:fs';
+import { chmodSync, readFileSync } from 'node:fs';
+
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
 await build({
   entryPoints: ['bin/orcc.js'],
@@ -16,6 +18,8 @@ await build({
   format: 'cjs',
   target: 'node18',
   legalComments: 'none',
+  // Bake the real version into the published bundle so it can self-update.
+  define: { __ORCC_VERSION__: JSON.stringify(pkg.version) },
 });
 
 chmodSync('dist/orcc.cjs', 0o755);

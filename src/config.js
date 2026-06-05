@@ -97,6 +97,19 @@ export async function toggleFavourite(id) {
   return favs.includes(id);
 }
 
+// ---- update-check throttle ----
+
+export async function getUpdateCheck() {
+  const cfg = await readConfig();
+  return cfg.updateCheck || null;
+}
+
+export async function setUpdateCheck(info) {
+  const cfg = await readConfig();
+  cfg.updateCheck = info; // { at: <ms>, latest: '<version>' }
+  await writeJson(configPath(), cfg);
+}
+
 // ---- model-list cache ----
 
 /** Return cached models. `allowStale` returns expired cache too (network-failure fallback). */

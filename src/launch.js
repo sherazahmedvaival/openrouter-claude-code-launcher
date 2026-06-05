@@ -14,6 +14,15 @@ export function npmUninstallGlobal(pkg) {
   });
 }
 
+/** Run `npm install -g <pkg>@latest`, inheriting stdio. Resolves with the exit code. */
+export function npmInstallGlobalLatest(pkg) {
+  return new Promise((resolve) => {
+    const child = spawn('npm', ['install', '-g', `${pkg}@latest`], { stdio: 'inherit', shell: onWindows });
+    child.on('error', () => resolve(1));
+    child.on('exit', (code) => resolve(code ?? 1));
+  });
+}
+
 /** Quick preflight: is the `claude` CLI on PATH? */
 export function isClaudeInstalled() {
   try {

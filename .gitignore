@@ -6,5 +6,6 @@ dist/
 # Secrets — never commit
 .env
 .env.*
-secrets.txt
 .npmrc
+my-scratchpad/*
+PROJECT_MEMORY.md

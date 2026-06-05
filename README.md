@@ -104,8 +104,13 @@ orcc                       # browse models, pick one, launch Claude Code
 orcc --list                # print free + paid (tool-capable) models and exit
 orcc --refresh             # ignore the ~10 min cache and re-fetch the catalog
 orcc -m anthropic/claude-haiku-4.5            # skip the picker, launch this model
+orcc --update              # update orcc to the latest version on npm
+orcc --version             # print the installed version
+orcc --uninstall [--yes]   # remove orcc's data (and optionally the package)
 orcc -- --dangerously-skip-permissions        # forward args after -- to claude
 ```
+
+Full flag list: `orcc --help`.
 
 ### Interactive flow
 

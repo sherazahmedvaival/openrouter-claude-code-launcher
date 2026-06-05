@@ -1,6 +1,6 @@
 {
   "name": "openrouter-claude-code-launcher",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "OpenRouter launcher for Claude Code — browse OpenRouter models (free + paid) and launch Claude Code against the selected one.",
   "type": "module",
   "bin": {

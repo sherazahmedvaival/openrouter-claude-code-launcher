@@ -4,9 +4,13 @@
 > models (free **and** paid) and launches [Claude Code](https://github.com/anthropics/claude-code)
 > against the one you pick — with **zero global config** and **per-launch credential injection**.
 
+[![npm version](https://img.shields.io/npm/v/openrouter-claude-code-launcher?logo=npm)](https://www.npmjs.com/package/openrouter-claude-code-launcher)
+[![npm downloads](https://img.shields.io/npm/dm/openrouter-claude-code-launcher)](https://www.npmjs.com/package/openrouter-claude-code-launcher)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+**📦 Published on npm:** [`openrouter-claude-code-launcher`](https://www.npmjs.com/package/openrouter-claude-code-launcher) — run it with `npx openrouter-claude-code-launcher`.
 
 ---
 
